@@ -1,13 +1,17 @@
 {
   "name": "picture-battle-websocket-client",
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && npx vercel --prod"
   },
   "dependencies": {
     "react": "^19.1.0",

@@ -7,7 +7,8 @@ function App() {
   const didOpenRef = useRef(false);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:3001");
+    const WS_URL = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:3001";
+    const socket = new WebSocket(WS_URL);
     wsRef.current = socket;
 
     socket.onopen = () => {
