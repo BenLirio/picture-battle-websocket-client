@@ -5,6 +5,7 @@ function App() {
   const [messages, setMessages] = useState<string[]>([]);
   const [games, setGames] = useState<string[]>([]);
   const [playerId, setPlayerId] = useState<string | null>(null);
+  const [playerToken, setPlayerToken] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const didOpenRef = useRef(false);
 
@@ -51,6 +52,14 @@ function App() {
           typeof msg.data.playerId === "string"
         ) {
           setPlayerId(msg.data.playerId);
+        } else if (
+          msg.type === "set_player" &&
+          msg.data &&
+          typeof msg.data.playerId === "string" &&
+          typeof msg.data.token === "string"
+        ) {
+          setPlayerId(msg.data.playerId);
+          setPlayerToken(msg.data.token);
         } else {
           setMessages((msgs) => [...msgs, event.data]);
         }
@@ -194,9 +203,18 @@ function App() {
             ))}
           </ul>
         )}
-        <div style={{ marginTop: 20, fontWeight: "bold" }}>
-          playerId: {playerId === null ? "<loading...>" : playerId}
-        </div>
+      </div>
+      <div
+        style={{
+          marginTop: 20,
+          fontWeight: "bold",
+          borderTop: "1px solid #666",
+          paddingTop: 10,
+        }}
+      >
+        playerId: {playerId === null ? "<loading...>" : playerId}
+        <br />
+        playerToken: {playerToken === null ? "<loading...>" : playerToken}
       </div>
     </div>
   );
