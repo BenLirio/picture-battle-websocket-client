@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import MessageInput from "./components/MessageInput";
+import MessageList from "./components/MessageList";
+import GameList from "./components/GameList";
+import PlayerInfo from "./components/PlayerInfo";
 
 function App() {
   const [input, setInput] = useState("");
@@ -129,93 +133,23 @@ function App() {
     }
   };
 
+  const handleGameClick = (gameId: string) => {
+    console.log("Clicked game:", gameId);
+    // Placeholder for future click handling logic
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <h1>WebSocket Echo Client</h1>
-      <div>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message"
-          style={{ width: 300, marginRight: 10 }}
-        />
-        <button onClick={sendMessage}>Send</button>
-        <button onClick={sendCreateGame} style={{ marginLeft: 10 }}>
-          Create Game
-        </button>
-      </div>
-      <div
-        style={{
-          marginTop: 20,
-          maxHeight: 300,
-          overflowY: "auto",
-          border: "1px solid #ccc",
-          padding: 10,
-        }}
-      >
-        {messages.map((msg, idx) => (
-          <div key={idx} style={{ marginBottom: 5 }}>
-            {msg}
-          </div>
-        ))}
-      </div>
-      <div
-        style={{
-          marginTop: 20,
-          maxHeight: 200,
-          overflowY: "auto",
-          border: "1px solid #666",
-          padding: 10,
-        }}
-      >
-        <h2>Games</h2>
-        {games.length === 0 ? (
-          <div>No games available</div>
-        ) : (
-          <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-            {games.map((gameId) => (
-              <li
-                key={gameId}
-                style={{
-                  cursor: "pointer",
-                  padding: "5px 10px",
-                  borderBottom: "1px solid #ccc",
-                  userSelect: "none",
-                }}
-                onClick={() => {
-                  console.log("Clicked game:", gameId);
-                  // Placeholder for future click handling logic
-                }}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    console.log("Activated game via keyboard:", gameId);
-                    // Placeholder for future keyboard activation logic
-                  }
-                }}
-                role="button"
-                aria-pressed="false"
-              >
-                {gameId}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div
-        style={{
-          marginTop: 20,
-          fontWeight: "bold",
-          borderTop: "1px solid #666",
-          paddingTop: 10,
-        }}
-      >
-        playerId: {playerId === null ? "<loading...>" : playerId}
-        <br />
-        playerToken: {playerToken === null ? "<loading...>" : playerToken}
-      </div>
+      <MessageInput
+        input={input}
+        onInputChange={setInput}
+        onSendMessage={sendMessage}
+        onCreateGame={sendCreateGame}
+      />
+      <MessageList messages={messages} />
+      <GameList games={games} onGameClick={handleGameClick} />
+      <PlayerInfo playerId={playerId} playerToken={playerToken} />
     </div>
   );
 }
