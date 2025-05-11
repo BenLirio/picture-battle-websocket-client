@@ -4,6 +4,7 @@ function App() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
   const [games, setGames] = useState<string[]>([]);
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const didOpenRef = useRef(false);
 
@@ -44,6 +45,12 @@ function App() {
             }
             return prevGames;
           });
+        } else if (
+          msg.type === "set_player_id" &&
+          msg.data &&
+          typeof msg.data.playerId === "string"
+        ) {
+          setPlayerId(msg.data.playerId);
         } else {
           setMessages((msgs) => [...msgs, event.data]);
         }
@@ -187,6 +194,9 @@ function App() {
             ))}
           </ul>
         )}
+        <div style={{ marginTop: 20, fontWeight: "bold" }}>
+          playerId: {playerId === null ? "<loading...>" : playerId}
+        </div>
       </div>
     </div>
   );
