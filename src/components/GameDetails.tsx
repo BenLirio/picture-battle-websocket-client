@@ -5,7 +5,8 @@ interface GameDetailsProps {
   game: {
     id: string;
     playerIds: string[];
-    state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS";
+    state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS" | "GAME_LOOP";
+    canAct: string[];
     settings: {
       maxPlayers: number;
     };
@@ -41,6 +42,9 @@ const GameDetails: React.FC<GameDetailsProps> = ({
       </p>
       <p>
         <strong>Max Players:</strong> {game.settings.maxPlayers}
+      </p>
+      <p>
+        <strong>Players who can act:</strong> {game.canAct.join(", ")}
       </p>
       <h3>Characters</h3>
       {game.characters.length > 0 ? (

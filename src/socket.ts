@@ -41,6 +41,7 @@ interface SetGameMessage {
       id: string;
       playerIds: string[];
       state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS"; // Using literal types for simplicity here, can use zod schema later
+      canAct: string[];
       settings: {
         maxPlayers: number;
       };
