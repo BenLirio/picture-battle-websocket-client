@@ -6,7 +6,11 @@ interface GameDetailsProps {
   game: {
     id: string;
     playerIds: string[];
-    state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS" | "GAME_LOOP";
+    state:
+      | "WAITING_FOR_PLAYERS"
+      | "SELECTING_CHARACTERS"
+      | "GAME_LOOP"
+      | "GAME_OVER";
     canAct: string[];
     settings: {
       maxPlayers: number;
