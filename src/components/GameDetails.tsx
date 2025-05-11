@@ -58,13 +58,14 @@ const GameDetails: React.FC<GameDetailsProps> = ({
       ) : (
         <p>No characters selected yet.</p>
       )}
-      {game.state === "SELECTING_CHARACTERS" && (
-        <CharacterSelect
-          gameId={game.id}
-          playerId={playerId}
-          playerToken={playerToken}
-        />
-      )}
+      {game.state === "SELECTING_CHARACTERS" &&
+        game.canAct.includes(playerId) && (
+          <CharacterSelect
+            gameId={game.id}
+            playerId={playerId}
+            playerToken={playerToken}
+          />
+        )}
     </div>
   );
 };
