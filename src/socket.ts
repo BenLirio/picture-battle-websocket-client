@@ -29,17 +29,41 @@ interface SetPlayerMessage {
   };
 }
 
+interface GameNoLongerAvailableMessage {
+  type: "game_no_longer_available";
+  gameId: string;
+}
+
+interface SetGameMessage {
+  type: "set_game";
+  data: {
+    game: {
+      id: string;
+      playerIds: string[];
+      state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS"; // Using literal types for simplicity here, can use zod schema later
+      settings: {
+        maxPlayers: number;
+      };
+    };
+  };
+}
+
 type WebSocketMessage =
   | GameIdsMessage
   | GameCreatedMessage
   | SetPlayerIdMessage
-  | SetPlayerMessage;
+  | SetPlayerMessage
+  | GameNoLongerAvailableMessage
+  | SetGameMessage;
 
 export const useWebSocket = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [games, setGames] = useState<string[]>([]);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [playerToken, setPlayerToken] = useState<string | null>(null);
+  const [currentGame, setCurrentGame] = useState<
+    SetGameMessage["data"]["game"] | null
+  >(null);
   const wsRef = useRef<WebSocket | null>(null);
   const didOpenRef = useRef(false);
 
@@ -77,11 +101,17 @@ export const useWebSocket = () => {
             }
             return prevGames;
           });
+        } else if (msg.type === "game_no_longer_available") {
+          setGames((prevGames) =>
+            prevGames.filter((gameId) => gameId !== msg.gameId)
+          );
         } else if (msg.type === "set_player_id") {
           setPlayerId(msg.data.playerId);
         } else if (msg.type === "set_player") {
           setPlayerId(msg.data.playerId);
           setPlayerToken(msg.data.token);
+        } else if (msg.type === "set_game") {
+          setCurrentGame(msg.data.game);
         } else {
           setMessages((msgs) => [...msgs, event.data]);
         }
@@ -140,6 +170,7 @@ export const useWebSocket = () => {
     games,
     playerId,
     playerToken,
+    currentGame,
     sendMessage,
   };
 };
