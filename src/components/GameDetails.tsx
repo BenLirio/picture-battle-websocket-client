@@ -19,6 +19,10 @@ interface GameDetailsProps {
       playerId: string;
       characterId: string;
     }>;
+    messages: Array<{
+      from: string;
+      message: string;
+    }>;
   } | null;
   playerId: string;
   playerToken: string;
@@ -79,6 +83,20 @@ const GameDetails: React.FC<GameDetailsProps> = ({
       ) : (
         <p>No characters selected yet.</p>
       )}
+
+      <h3>Messages</h3>
+      {game.messages && game.messages.length > 0 ? (
+        <ul>
+          {game.messages.map((message, index) => (
+            <li key={index}>
+              <strong>{message.from}:</strong> {message.message}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No messages yet.</p>
+      )}
+
       {game.state === "SELECTING_CHARACTERS" &&
         game.canAct.includes(playerId) && (
           <CharacterSelect
