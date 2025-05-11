@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import CharacterSelect from "./CharacterSelect";
+import { useWebSocket } from "../socket";
 
 interface GameDetailsProps {
   game: {
@@ -24,9 +25,25 @@ const GameDetails: React.FC<GameDetailsProps> = ({
   playerId,
   playerToken,
 }) => {
+  const { sendMessage } = useWebSocket();
+  const [actionText, setActionText] = useState("");
+
   if (!game) {
     return null; // Or a loading indicator, or a message
   }
+
+  const handleActionSubmit = () => {
+    if (game && playerId && playerToken && actionText) {
+      const actionData = {
+        gameId: game.id,
+        playerId: playerId,
+        playerToken: playerToken,
+        action: actionText,
+      };
+      sendMessage(JSON.stringify({ action: "doAction", data: actionData }));
+      setActionText(""); // Clear the input after sending
+    }
+  };
 
   return (
     <div>
@@ -66,6 +83,18 @@ const GameDetails: React.FC<GameDetailsProps> = ({
             playerToken={playerToken}
           />
         )}
+
+      {game.state === "GAME_LOOP" && game.canAct.includes(playerId) && (
+        <div>
+          <input
+            type="text"
+            value={actionText}
+            onChange={(e) => setActionText(e.target.value)}
+            placeholder="Enter action"
+          />
+          <button onClick={handleActionSubmit}>Send Action</button>
+        </div>
+      )}
     </div>
   );
 };
