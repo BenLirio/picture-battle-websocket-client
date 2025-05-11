@@ -44,6 +44,10 @@ interface SetGameMessage {
       settings: {
         maxPlayers: number;
       };
+      characters: Array<{
+        playerId: string;
+        characterId: string;
+      }>;
     };
   };
 }

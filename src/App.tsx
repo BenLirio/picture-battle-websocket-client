@@ -25,8 +25,12 @@ function App() {
   return (
     <div style={{ padding: 20 }}>
       <h1>WebSocket Echo Client</h1>
-      {currentGame ? (
-        <GameDetails game={currentGame} />
+      {currentGame && playerId && playerToken ? (
+        <GameDetails
+          game={currentGame}
+          playerId={playerId}
+          playerToken={playerToken}
+        />
       ) : (
         <>
           <MessageInput onCreateGame={handleCreateGame} />
