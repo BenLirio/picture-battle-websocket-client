@@ -5,7 +5,7 @@ import GameDetails from "./components/GameDetails";
 import { useWebSocket } from "./socket";
 
 function App() {
-  const { games, playerId, playerToken, currentGame, sendMessage } =
+  const { games, playerId, playerToken, currentGame, sendMessage, actions } =
     useWebSocket();
 
   const handleCreateGame = () => {
@@ -30,6 +30,8 @@ function App() {
           game={currentGame}
           playerId={playerId}
           playerToken={playerToken}
+          actions={actions}
+          sendMessage={sendMessage}
         />
       ) : (
         <>

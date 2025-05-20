@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import CharacterSelect from "./CharacterSelect";
-import { useWebSocket } from "../socket";
 
 interface GameDetailsProps {
   game: {
@@ -26,30 +25,30 @@ interface GameDetailsProps {
   } | null;
   playerId: string;
   playerToken: string;
+  actions: string[];
+  sendMessage: (message: string) => void;
 }
 
 const GameDetails: React.FC<GameDetailsProps> = ({
   game,
   playerId,
   playerToken,
+  actions,
+  sendMessage,
 }) => {
-  const { sendMessage } = useWebSocket();
-  const [actionText, setActionText] = useState("");
-
   if (!game) {
     return null; // Or a loading indicator, or a message
   }
 
-  const handleActionSubmit = () => {
-    if (game && playerId && playerToken && actionText) {
+  const handleActionSubmit = (actionIndex: number) => {
+    if (game && playerId && playerToken && actions[actionIndex] !== undefined) {
       const actionData = {
         gameId: game.id,
         playerId: playerId,
         playerToken: playerToken,
-        action: actionText,
+        actionIndex: actionIndex, // Send the index
       };
       sendMessage(JSON.stringify({ action: "doAction", data: actionData }));
-      setActionText(""); // Clear the input after sending
     }
   };
 
@@ -108,13 +107,16 @@ const GameDetails: React.FC<GameDetailsProps> = ({
 
       {game.state === "GAME_LOOP" && game.canAct.includes(playerId) && (
         <div>
-          <input
-            type="text"
-            value={actionText}
-            onChange={(e) => setActionText(e.target.value)}
-            placeholder="Enter action"
-          />
-          <button onClick={handleActionSubmit}>Send Action</button>
+          <h3>Available Actions:</h3>
+          {actions.length > 0 ? (
+            actions.map((action, index) => (
+              <button key={index} onClick={() => handleActionSubmit(index)}>
+                {action}
+              </button>
+            ))
+          ) : (
+            <p>No actions available.</p>
+          )}
         </div>
       )}
     </div>

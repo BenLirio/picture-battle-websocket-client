@@ -40,7 +40,11 @@ interface SetGameMessage {
     game: {
       id: string;
       playerIds: string[];
-      state: "WAITING_FOR_PLAYERS" | "SELECTING_CHARACTERS"; // Using literal types for simplicity here, can use zod schema later
+      state:
+        | "WAITING_FOR_PLAYERS"
+        | "SELECTING_CHARACTERS"
+        | "GAME_LOOP"
+        | "GAME_OVER";
       canAct: string[];
       settings: {
         maxPlayers: number;
@@ -49,7 +53,18 @@ interface SetGameMessage {
         playerId: string;
         characterId: string;
       }>;
+      messages?: Array<{
+        from: string;
+        message: string;
+      }>;
     };
+  };
+}
+
+interface SetActionsMessage {
+  type: "set_actions";
+  data: {
+    actions: string[];
   };
 }
 
@@ -59,11 +74,13 @@ type WebSocketMessage =
   | SetPlayerIdMessage
   | SetPlayerMessage
   | GameNoLongerAvailableMessage
-  | SetGameMessage;
+  | SetGameMessage
+  | SetActionsMessage;
 
 export const useWebSocket = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [games, setGames] = useState<string[]>([]);
+  const [actions, setActions] = useState<string[]>([]);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [playerToken, setPlayerToken] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<
@@ -87,18 +104,17 @@ export const useWebSocket = () => {
       console.log("Received message:", event.data);
       try {
         const msg: WebSocketMessage = JSON.parse(event.data);
-        if (
-          msg.type === "game_ids" &&
-          msg.data &&
-          Array.isArray(msg.data.gameIds)
-        ) {
-          setGames((prevGames) => {
-            const newGames = msg.data.gameIds.filter(
-              (id: unknown): id is string =>
-                typeof id === "string" && !prevGames.includes(id)
-            );
-            return [...prevGames, ...newGames];
-          });
+
+        if (msg.type === "game_ids") {
+          if (msg.data && Array.isArray(msg.data.gameIds)) {
+            setGames((prevGames) => {
+              const newGames = msg.data.gameIds.filter(
+                (id: unknown): id is string =>
+                  typeof id === "string" && !prevGames.includes(id)
+              );
+              return [...prevGames, ...newGames];
+            });
+          }
         } else if (msg.type === "game_created") {
           setGames((prevGames) => {
             if (!prevGames.includes(msg.gameId)) {
@@ -117,6 +133,8 @@ export const useWebSocket = () => {
           setPlayerToken(msg.data.token);
         } else if (msg.type === "set_game") {
           setCurrentGame(msg.data.game);
+        } else if (msg.type === "set_actions") {
+          setActions(msg.data.actions);
         } else {
           setMessages((msgs) => [...msgs, event.data]);
         }
@@ -176,6 +194,7 @@ export const useWebSocket = () => {
     playerId,
     playerToken,
     currentGame,
+    actions,
     sendMessage,
   };
 };
